@@ -13,11 +13,12 @@ const ROUTES = new Map([
   ['GET /emails', getEmailsRoute],
 ]);
 
-app.use((req, res) => {
+const router = ((req, res) => {
   const route = `${req.method} ${req.url}`;
   const handler = ROUTES.get(route) || res.end(`You asked for ${route}`)
-
   handler(req, res);
 })
+
+app.use(router);
 
 app.listen(3000);
