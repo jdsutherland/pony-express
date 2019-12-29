@@ -2,11 +2,13 @@ const express = require('express');
 const generateId = require('../lib/generate-id');
 const emails = require('../fixtures/emails');
 const jsonBodyParser = require('../lib/json-body-parser');
+const NotFound = require('../lib/not-found');
 
 const getEmailsRoute = (req, res) => res.send(emails);
 
 const getEmailRoute = (req, res) => {
   const email = emails.find(u => u.id === req.params.id)
+  if (!email) throw new NotFound();
   res.send(email);
 }
 
