@@ -9,17 +9,17 @@ const getUsersRoute = (req, res) => {
   res.send(users);
 }
 const usersRouter = express.Router();
-usersRouter.get('/users', getUsersRoute)
-usersRouter.get('/users/:id', getUsersRoute)
+usersRouter.get('/', getUsersRoute)
+usersRouter.get('/:id', getUsersRoute)
 
 const getEmailsRoute = (req, res) => res.send(emails);
 const emailsRouter = express.Router();
-emailsRouter.get('/emails', getEmailsRoute)
+emailsRouter.get('/', getEmailsRoute)
 
 const routeNotFound = (req, res) => res.end(`You asked for ${req.method} ${req.url}`)
 
-app.use(usersRouter);
-app.use(emailsRouter);
+app.use('/users', usersRouter);
+app.use('/emails', emailsRouter);
 app.use(routeNotFound); // FALLBACK
 
 app.listen(3000);
