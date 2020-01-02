@@ -46,11 +46,10 @@ describe('emails endpoints', () => {
       })
   })
 
-  it('delete should remove an existing email', async (done) => {
+  it('delete should remove an existing email', async () => {
     const res = await request(app)
       .delete('/emails/1')
       .expect(204)
-      .expect(_ => done())
   })
 
 })
