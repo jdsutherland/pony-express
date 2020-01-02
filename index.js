@@ -8,7 +8,7 @@ const app = express();
 const routeNotFound = (req, res) => res.end(`You asked for ${req.method} ${req.url}`)
 
 app.use(logger);
-app.use(compress({ threshold: 0 }));
+app.use(compress());
 app.use('/users', usersRouter);
 app.use('/emails', emailsRouter);
 app.use(routeNotFound);
