@@ -43,13 +43,18 @@ emailsRouter.route('/')
   .get(getEmailsRoute)
   .post(
     bodyParser.json(),
+    bodyParser.urlencoded({extended: true}),
     upload.array('attachments'),
     createEmailRoute
   );
 
 emailsRouter.route('/:id')
   .get(getEmailRoute)
-  .patch(bodyParser.json(), updateEmailRoute)
+  .patch(
+    bodyParser.json(),
+    bodyParser.urlencoded({extended: true}),
+    updateEmailRoute
+  )
   .delete(deleteEmailRoute);
 
 module.exports = emailsRouter;
