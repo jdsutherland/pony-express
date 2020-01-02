@@ -8,6 +8,13 @@ afterAll(async () => {
 
 describe('emails endpoints', () => {
 
+  it('should use compression', (done) => {
+    const res = request(app)
+      .get('/emails')
+      .expect('Content-Encoding', 'gzip')
+      .expect(200, done)
+  });
+
   it('get should return a json 200', (done) => {
     const res = request(app)
       .get('/emails')
