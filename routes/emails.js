@@ -25,7 +25,9 @@ const createEmailRoute = async (req, res) => {
 }
 
 const updateEmailRoute = async (req, res) => {
-  let email = emails.find(u => u.id === req.params.id)
+  const newAttachments = (req.files || []).map(f => f.filename)
+  const email = emails.find(u => u.id === req.params.id)
+  req.body.attachments = [...(email.attachments || []), ...newAttachments]
   Object.assign(email, req.body)
   res.status(200);
   res.send(email);
@@ -53,6 +55,7 @@ emailsRouter.route('/:id')
   .patch(
     bodyParser.json(),
     bodyParser.urlencoded({extended: true}),
+    upload.array('attachments'),
     updateEmailRoute
   )
   .delete(deleteEmailRoute);

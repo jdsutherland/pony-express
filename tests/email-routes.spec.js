@@ -32,14 +32,17 @@ describe('emails endpoints', () => {
   })
 
   it('patch should update an existing email', async (done) => {
-    const expected = { name: 'Bob' }
-    jest.spyOn(emails, 'find').mockReturnValue(expected)
+    const email = { id: 1, attachments: ['fake'] }
+    const emailCopy = {...email}
+    const attachment = './fixtures/emails.json';
+    jest.spyOn(emails, 'find').mockReturnValue(email)
     const res = await request(app)
       .patch('/emails/1')
-      .send(expected)
+      .attach('attachments', "./fixtures/emails.json")
       .expect(200)
       .expect(res => {
-        expect(res.body).toEqual(expected)
+        expect(res.body).toEqual(email)
+        expect(emailCopy).not.toEqual(email)
         done()
       })
   })
