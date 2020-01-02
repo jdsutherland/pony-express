@@ -1,4 +1,5 @@
 const request = require('supertest')
+const fs = require('fs');
 const { app, server } = require('../index')
 const emails = require('../fixtures/emails');
 
@@ -15,15 +16,17 @@ describe('emails endpoints', () => {
       .expect(200, done)
   })
 
-  it('post should create a new email', async (done) => {
-    const expected = { name: 'Bob' }
-    jest.spyOn(JSON, 'parse').mockReturnValue(expected)
+  it('post should save attachments', async (done) => {
+    const attachment = './fixtures/emails.json';
     const res = await request(app)
       .post('/emails')
-      .send(expected)
+      .attach('attachments', attachment)
       .expect(201)
-      .expect(res => {
-        expect(res.body).toEqual(expected)
+      .then(res => {
+        res.body.attachments.forEach(f => {
+          expect(fs.existsSync(`./uploads/${f}`)).toBe(true);
+          fs.unlinkSync(`./uploads/${f}`)
+        })
         done()
       })
   })

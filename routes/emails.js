@@ -1,8 +1,12 @@
 const express = require('express');
+const path = require('path');
 const generateId = require('../lib/generate-id');
 const emails = require('../fixtures/emails');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const NotFound = require('../lib/not-found');
+
+const upload = multer({ dest: path.join(__dirname, '../uploads') })
 
 const getEmailsRoute = (req, res) => res.send(emails);
 
@@ -13,7 +17,8 @@ const getEmailRoute = (req, res) => {
 }
 
 const createEmailRoute = async (req, res) => {
-  const newEmail = { ...req.body, id: generateId() }
+  const attachments = (req.files || []).map(f => f.filename)
+  const newEmail = { ...req.body, id: generateId(), attachments }
   emails.push(newEmail);
   res.status(201);
   res.send(newEmail);
@@ -36,7 +41,11 @@ const emailsRouter = express.Router();
 
 emailsRouter.route('/')
   .get(getEmailsRoute)
-  .post(bodyParser.json(), createEmailRoute);
+  .post(
+    bodyParser.json(),
+    upload.array('attachments'),
+    createEmailRoute
+  );
 
 emailsRouter.route('/:id')
   .get(getEmailRoute)
