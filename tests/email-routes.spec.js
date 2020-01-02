@@ -23,9 +23,9 @@ describe('emails endpoints', () => {
       .attach('attachments', ATTACHMENT)
       .expect(201)
       .then(res => {
-        res.body.attachments.forEach(f => {
-          expect(fs.existsSync(`./uploads/${f}`)).toBe(true);
-          fs.unlinkSync(`./uploads/${f}`)
+        res.body.attachments.forEach(a => {
+          expect(fs.existsSync(`./${a.url}`)).toBe(true);
+          fs.unlinkSync(`./${a.url}`)
         })
         done()
       })

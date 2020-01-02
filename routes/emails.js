@@ -17,7 +17,9 @@ const getEmailRoute = (req, res) => {
 }
 
 const createEmailRoute = async (req, res) => {
-  const attachments = (req.files || []).map(f => f.filename)
+  const attachments = (req.files || []).map(f => {
+    return { url: `/uploads/${f.filename}`, type: f.mimetype}
+  })
   const newEmail = { ...req.body, id: generateId(), attachments }
   emails.push(newEmail);
   res.status(201);
