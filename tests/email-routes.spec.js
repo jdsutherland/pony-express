@@ -2,6 +2,7 @@ const request = require('supertest')
 const fs = require('fs');
 const { app, server } = require('../index')
 const emails = require('../fixtures/emails');
+const ATTACHMENT = './fixtures/emails.json';
 
 afterAll(async () => {
   server.close()
@@ -17,10 +18,9 @@ describe('emails endpoints', () => {
   })
 
   it('post should save attachments', async (done) => {
-    const attachment = './fixtures/emails.json';
     const res = await request(app)
       .post('/emails')
-      .attach('attachments', attachment)
+      .attach('attachments', ATTACHMENT)
       .expect(201)
       .then(res => {
         res.body.attachments.forEach(f => {
@@ -34,13 +34,12 @@ describe('emails endpoints', () => {
   it('patch should update an existing email', async (done) => {
     const email = { id: 1, attachments: ['fake'] }
     const emailCopy = {...email}
-    const attachment = './fixtures/emails.json';
     jest.spyOn(emails, 'find').mockReturnValue(email)
     const res = await request(app)
       .patch('/emails/1')
-      .attach('attachments', "./fixtures/emails.json")
+      .attach('attachments', ATTACHMENT)
       .expect(200)
-      .expect(res => {
+      .then(res => {
         expect(res.body).toEqual(email)
         expect(emailCopy).not.toEqual(email)
         done()
