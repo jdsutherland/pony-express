@@ -2,13 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const findUser = require('../lib/find-user');
-
-const signature = '1m_s3cure';
+require('dotenv').config();
 
 const createToken = (user) =>
   jwt.sign(
     { userId: user.id },
-    signature,
+    process.env.SIGNATURE,
     { expiresIn: '7d' }
   );
 
