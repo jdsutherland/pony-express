@@ -5,7 +5,7 @@ const emails = require('../fixtures/emails');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const NotFound = require('../lib/not-found');
-const requireAuth = require('../lib/require-auth');
+const auth = require('../lib/require-auth');
 
 const upload = multer({ dest: path.join(__dirname, '../uploads') })
 
@@ -43,7 +43,7 @@ const deleteEmailRoute = async (req, res) => {
 }
 
 const emailsRouter = express.Router();
-emailsRouter.use(requireAuth);
+emailsRouter.use(auth.requireAuth);
 
 emailsRouter.route('/')
   .get(getEmailsRoute)

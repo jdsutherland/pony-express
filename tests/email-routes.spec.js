@@ -1,14 +1,27 @@
 const request = require('supertest')
 const fs = require('fs');
-const { app, server } = require('../index')
-const emails = require('../fixtures/emails');
+const sandbox = require('sinon').createSandbox();
 const ATTACHMENT = './fixtures/emails.json';
-
-afterAll(async () => {
-  server.close()
-});
+let auth;
+let app;
+let server;
+let emails;
 
 describe('emails endpoints', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    auth = require('../lib/require-auth');
+    sandbox.stub(auth, 'requireAuth')
+      .callsFake((req, res, next) => next())
+    app = require('../index').app
+    server = require('../index').server
+    emails = require('../fixtures/emails');
+  })
+
+  afterEach(async () => {
+    sandbox.restore();
+    await server.close();
+  })
 
   it('get should return a json 200', (done) => {
     const res = request(app)

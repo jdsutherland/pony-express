@@ -1,10 +1,24 @@
 const request = require('supertest')
-const { app, server } = require('../index')
-const emails = require('../fixtures/emails');
+const sandbox = require('sinon').createSandbox();
+let auth;
+let app;
+let server;
+let emails;
 
-afterAll(async () => {
-  server.close()
-});
+beforeEach(() => {
+  jest.resetModules();
+  auth = require('../lib/require-auth');
+  sandbox.stub(auth, 'requireAuth')
+    .callsFake((req, res, next) => next())
+  app = require('../index').app
+  server = require('../index').server
+  emails = require('../fixtures/emails');
+})
+
+afterEach(async () => {
+  sandbox.restore();
+  await server.close();
+})
 
 describe('end-to-end', () => {
 
