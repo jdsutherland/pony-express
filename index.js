@@ -17,7 +17,7 @@ const routeNotFound = (req, res) => res.end(`You asked for ${req.method} ${req.u
 app.use(logger);
 app.use(compress());
 app.use(serveStatic(path.join(__dirname, 'public')));
-app.use(tokenAuth);
+app.use(tokenAuth(findUser.byToken));
 app.use(basicAuth(findUser.byCredentials));
 app.use('/uploads', uploadsRouter, serveStatic(path.join(__dirname, 'uploads')));
 app.use('/tokens', tokensRouter);
