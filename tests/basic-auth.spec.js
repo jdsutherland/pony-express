@@ -1,13 +1,24 @@
 const request = require('supertest')
-const { app, server } = require('../index')
-const basicAuth = require('../lib/basic-auth');
-const users = require('../fixtures/users');
-
-afterAll(async () => {
-  server.close()
-});
+const sandbox = require('sinon').createSandbox();
+let auth;
+let app;
+let server;
 
 describe('basic auth', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    auth = require('../lib/require-auth');
+    sandbox.stub(auth, 'requireAuth')
+      .callsFake((req, res, next) => next())
+    app = require('../index').app
+    server = require('../index').server
+  })
+
+  afterEach(async () => {
+    sandbox.restore();
+    await server.close();
+  })
+
   it('does nothing without Authorization header', (done) => {
     const res = request(app)
       .get('/emails')
