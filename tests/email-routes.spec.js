@@ -12,7 +12,10 @@ describe('emails endpoints', () => {
     jest.resetModules();
     auth = require('../lib/require-auth');
     sandbox.stub(auth, 'requireAuth')
-      .callsFake((req, res, next) => next())
+      .callsFake((req, res, next) => {
+        req.user = {};
+        return next();
+      })
     app = require('../index').app
     server = require('../index').server
     emails = require('../fixtures/emails');
@@ -45,11 +48,13 @@ describe('emails endpoints', () => {
   })
 
   it('patch should update an existing email', async (done) => {
-    const email = { id: 1, attachments: ['fake'] }
+    const id = 1;
+    // FIXME: user.id == undefined and email.from == undefined so this implicitly passes
+    const email = { id, attachments: ['fake'] }
     const emailCopy = {...email}
     jest.spyOn(emails, 'find').mockReturnValue(email)
     const res = await request(app)
-      .patch('/emails/1')
+      .patch(`/emails/${id}`)
       .attach('attachments', ATTACHMENT)
       .expect(200)
       .then(res => {
@@ -59,10 +64,30 @@ describe('emails endpoints', () => {
       })
   })
 
+  it("patch returns 403 if user not same", async () => {
+    const email = { id: 2, from: 2, attachments: ['fake'] }
+    jest.spyOn(emails, 'find').mockReturnValue(email)
+    const res = await request(app)
+      .patch('/emails/1')
+      .expect(403)
+  });
+
   it('delete should remove an existing email', async () => {
+    // FIXME: user.id == undefined and email.to == undefined so this implicitly passes
+    const email = {}
+    jest.spyOn(emails, 'find').mockReturnValue(email)
     const res = await request(app)
       .delete('/emails/1')
       .expect(204)
   })
+
+  it("delete returns 403 if user not same ", async () => {
+    // FIXME: user.id == undefined and email.from == undefined so this implicitly passes
+    const email = { to: 2, attachments: ['fake'] }
+    jest.spyOn(emails, 'find').mockReturnValue(email)
+    const res = await request(app)
+      .delete('/emails/1')
+      .expect(403)
+  });
 
 })
