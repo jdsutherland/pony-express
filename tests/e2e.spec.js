@@ -5,24 +5,23 @@ let app;
 let server;
 let emails;
 
-beforeEach(() => {
-  jest.resetModules();
-  auth = require('../lib/require-auth');
-  sandbox.stub(auth, 'requireAuth')
-    .callsFake((req, res, next) => next())
-  app = require('../index').app
-  server = require('../index').server
-  emails = require('../fixtures/emails');
-})
-
-afterEach(async () => {
-  sandbox.restore();
-  await server.close();
-})
-
 describe('end-to-end', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    auth = require('../lib/require-auth');
+    sandbox.stub(auth, 'requireAuth')
+      .callsFake((req, res, next) => next())
+    app = require('../index').app
+    server = require('../index').server
+    emails = require('../fixtures/emails');
+  })
 
-  describe('upload email w/ jpg attachment', () => {
+  afterEach(async () => {
+    sandbox.restore();
+    await server.close();
+  })
+
+  describe('POST email w/ attachment then GET that attachment', () => {
     it('uses mimetype when serving static', (done) => {
       const res = request(app)
         .post('/emails')
