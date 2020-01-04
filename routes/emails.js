@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const NotFound = require('../lib/not-found');
 const auth = require('../lib/require-auth');
+const enforce = require('../lib/enforce');
 
 const upload = multer({ dest: path.join(__dirname, '../uploads') })
 
@@ -42,14 +43,6 @@ const updateEmailPolicy = (req) => {
   return user.id === email.from
 }
 
-const authorizedUpdateEmailRoute = (req, res, next) => {
-  if (updateEmailPolicy(req)) {
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-}
-
 const deleteEmailRoute = async (req, res) => {
   const idx = emails.findIndex(u => u.id === req.params.id);
   emails.splice(idx, 1);
@@ -60,14 +53,6 @@ const deleteEmailPolicy = (req) => {
   const email = emails.find(e => e.id === req.params.id)
   const user = req.user;
   return user.id === email.to
-}
-
-const authorizedDeleteEmailRoute = (req, res, next) => {
-  if (deleteEmailPolicy(req)) {
-    next();
-  } else {
-    res.sendStatus(403);
-  }
 }
 
 const emailsRouter = express.Router();
@@ -85,14 +70,14 @@ emailsRouter.route('/')
 emailsRouter.route('/:id')
   .get(getEmailRoute)
   .patch(
-    authorizedUpdateEmailRoute,
+    enforce(updateEmailPolicy),
     bodyParser.json(),
     bodyParser.urlencoded({extended: true}),
     upload.array('attachments'),
     updateEmailRoute
   )
   .delete(
-    authorizedDeleteEmailRoute,
+    enforce(deleteEmailPolicy),
     deleteEmailRoute
   );
 
