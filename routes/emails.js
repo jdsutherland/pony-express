@@ -31,29 +31,24 @@ const createEmailRoute = async (req, res) => {
 const updateEmailRoute = async (req, res) => {
   const newAttachments = (req.files || []).map(f => f.filename)
   const email = emails.find(e => e.id === req.params.id)
+  req.authorize(email);
   req.body.attachments = [...(email.attachments || []), ...newAttachments]
   Object.assign(email, req.body)
   res.status(200);
   res.send(email);
 }
 
-const updateEmailPolicy = (req) => {
-  const email = emails.find(e => e.id === req.params.id)
-  const user = req.user;
-  return user.id === email.from
-}
+const updateEmailPolicy = (user, email) => user.id === email.from
 
 const deleteEmailRoute = async (req, res) => {
+  const email = emails.find(e => e.id === req.params.id)
+  req.authorize(email);
   const idx = emails.findIndex(u => u.id === req.params.id);
   emails.splice(idx, 1);
   res.sendStatus(204);
 }
 
-const deleteEmailPolicy = (req) => {
-  const email = emails.find(e => e.id === req.params.id)
-  const user = req.user;
-  return user.id === email.to
-}
+const deleteEmailPolicy = (user, email) => user.id === email.to
 
 const emailsRouter = express.Router();
 emailsRouter.use(auth.requireAuth);
