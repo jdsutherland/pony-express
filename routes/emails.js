@@ -36,10 +36,14 @@ const updateEmailRoute = async (req, res) => {
   res.send(email);
 }
 
-const authorizedUpdateEmailRoute = (req, res, next) => {
+const updateEmailPolicy = (req) => {
   const email = emails.find(e => e.id === req.params.id)
   const user = req.user;
-  if (user.id === email.from) {
+  return user.id === email.from
+}
+
+const authorizedUpdateEmailRoute = (req, res, next) => {
+  if (updateEmailPolicy(req)) {
     next();
   } else {
     res.sendStatus(403);
@@ -52,10 +56,14 @@ const deleteEmailRoute = async (req, res) => {
   res.sendStatus(204);
 }
 
-const authorizedDeleteEmailRoute = (req, res, next) => {
+const deleteEmailPolicy = (req) => {
   const email = emails.find(e => e.id === req.params.id)
   const user = req.user;
-  if (user.id === email.to) {
+  return user.id === email.to
+}
+
+const authorizedDeleteEmailRoute = (req, res, next) => {
+  if (deleteEmailPolicy(req)) {
     next();
   } else {
     res.sendStatus(403);
